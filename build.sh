@@ -20,20 +20,6 @@ build(){
 	else
 		mv spiral builds/$bdir
 	fi
-
-	cp README.md builds/$bdir
-	cp CHANGELOG.md builds/$bdir
-	cp LICENSE builds/$bdir
-	cd builds
-
-	if [ "$2" == "linux" ]; then
-		tar -zcf $bdir.tar.gz $bdir
-	else
-		zip -r -q $bdir.zip $bdir
-	fi
-
-	rm -rf $bdir
-	cd ..
 }
 
 if [ "$1" == "all" ]; then
@@ -43,6 +29,12 @@ if [ "$1" == "all" ]; then
 	build "Linux" "linux" "amd64"
 	build "FreeBSD" "freebsd" "amd64"
 	exit
+fi
+
+if [ "$1" == "linux" ]; then
+  rm -rf builds/
+  build "Linux" "linux" "amd64"
+  exit
 fi
 
 CGO_ENABLED=0 go build -ldflags "$LDFLAGS -extldflags '-static'" -o "$OD/spiral" main.go
