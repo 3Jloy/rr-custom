@@ -1,7 +1,6 @@
 package redis
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/spiral/roadrunner/service/rpc"
 	"github.com/stretchr/testify/assert"
@@ -25,8 +24,8 @@ func TestRpcService_Set(t *testing.T) {
 		rpcMethod,
 		Message{
 			Key:        "1",
-			Value:      json.RawMessage(testString),
-			Expiration: "1h",
+			Value:      testString,
+			Expiration: 30,
 		},
 		&output,
 	))
@@ -40,8 +39,8 @@ func TestRpcService_Set(t *testing.T) {
 		rpcMethod,
 		Message{
 			Key:        "2",
-			Value:      json.RawMessage(testString),
-			Expiration: "5",
+			Value:      testString,
+			Expiration: 30,
 		},
 		&output,
 	)

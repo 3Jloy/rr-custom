@@ -1,14 +1,13 @@
 package redis
 
 import (
-	"encoding/json"
 	"time"
 )
 
 type Message struct {
-	Key        string          `json:"key"`
-	Value      json.RawMessage `json:"value"`
-	Expiration string          `json:"expiration"`
+	Key        string `json:"key"`
+	Value      string `json:"value"`
+	Expiration int    `json:"expiration"`
 }
 
 type rpcService struct {
@@ -16,23 +15,10 @@ type rpcService struct {
 }
 
 func (s *rpcService) Set(input Message, output *bool) error {
-	expiration, err := time.ParseDuration(input.Expiration)
-	if err != nil {
-		*output = false
-		return err
-	}
-
-	var value []byte
-	value, _ = input.Value.MarshalJSON()
-
-	_, err = s.svc.redisClient.Set(input.Key, value, expiration).Result()
-	if err != nil {
-		*output = false
-		return err
-	}
-
-	*output = true
-	return nil
+	expiration := time.Second * time.Duration(input.Expiration)
+	_, err := s.svc.redisClient.Set(input.Key, input.Value, expiration).Result()
+	*output = err != nil
+	return err
 }
 
 func (s *rpcService) Get(input Message, output *string) error {
@@ -42,10 +28,7 @@ func (s *rpcService) Get(input Message, output *string) error {
 }
 
 func (s *rpcService) Del(input []string, output *bool) error {
-	if _, err := s.svc.redisClient.Del(input...).Result(); err != nil {
-		return err
-	}
-
-	*output = true
-	return nil
+	_, err := s.svc.redisClient.Del(input...).Result()
+	*output = err != nil
+	return err
 }
